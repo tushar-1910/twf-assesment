@@ -23,9 +23,9 @@ const productWeights = {
 
 // Distance Matrix (Only to L1 since direct C1 <-> C3 travel is not possible)
 const distances = {
-  C1: 3, // Distance between C1 and L1
-  C2: 2.5, // Distance between C2 and L1
-  C3: 2, // Distance between C3 and L1
+  C1: { L1: 3, C2: 4 },
+  C2: { L1: 2.5, C1: 4, C3: 3 },
+  C3: { L1: 2, C2: 2 },
 };
 
 // Warehouse Stock Data
@@ -65,7 +65,7 @@ const calculateCost = (order) => {
 
     // If the truck is switching centers (via L1), charge empty travel cost
     if (lastCenter !== null && lastCenter !== center) {
-      totalCost += distances[center] * 10; // Empty truck cost
+      totalCost += (distances[center]?.L1 || 0) * 10; // Empty truck cost
     }
 
     // Compute total weight for this center
@@ -77,7 +77,7 @@ const calculateCost = (order) => {
     // Delivery cost from center to L1
     if (centerWeight > 0) {
       let costPerUnit = calculateCostPerUnit(centerWeight);
-      totalCost += distances[center] * costPerUnit;
+      totalCost += (distances[center]?.L1 || 0) * costPerUnit;
       lastCenter = "L1"; // After pickup, truck delivers to L1
     }
   }
